@@ -1,5 +1,7 @@
-from pydantic import BaseModel, model_validator
-from datetime import date
+from datetime import datetime
+
+from pydantic import BaseModel
+from pydantic import root_validator
 
 
 class CreateBlog(BaseModel):
@@ -7,17 +9,21 @@ class CreateBlog(BaseModel):
     slug: str
     content: str | None
 
-    @model_validator(mode="before")
+    @root_validator(pre=True)
     def generate_slug(cls, values):
-        if 'title' in values:
-            values['slug'] = values.get("title").replace("", "-").lower()
+        if "title" in values:
+            values["slug"] = values.get("title").replace("", "-").lower()
         return values
 
 
 class ShowBlog(BaseModel):
     title: str
     content: str | None
-    created_at: date
+    created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+
+class UpdateBlog(CreateBlog):
+    pass
